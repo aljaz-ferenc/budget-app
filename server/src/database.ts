@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 
-async function connectDB() {
+export async function connectDB() {
   const client: MongoClient = new MongoClient(process.env.DATABASE!!);
 
   try {
@@ -12,7 +12,7 @@ async function connectDB() {
   }
 }
 
-async function getCollection(collectionName: string) {
+export async function getCollection(collectionName: string) {
   try {
     const client = await connectDB();
     if (!client) throw new Error("Could not instantiate client");
@@ -21,13 +21,13 @@ async function getCollection(collectionName: string) {
     return collection;
   } catch (err: any) {
     console.log(err);
-    return undefined
+    throw new Error(`Collection not found: ${err.message}`)
   }
 }
 
-enum Collections {
+export enum Collections {
   USERS = "users",
   TRANSACTIONS = "transactions",
 }
 
-module.exports = { connectDB, getCollection, Collections };
+// module.exports = { connectDB, getCollection, Collections };

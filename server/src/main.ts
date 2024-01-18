@@ -1,5 +1,7 @@
 import express from "express";
 import authRoutes from './routes/authRoutes'
+import transactionRoutes from './routes/transactionRoutes'
+
 const cors = require("cors")
 const morgan = require('morgan')
 const {GlobalErrorHandler} = require('./controllers/errorController.ts')
@@ -16,6 +18,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/transactions', transactionRoutes)
 
 const PORT = process.env.PORT || '3000'
 

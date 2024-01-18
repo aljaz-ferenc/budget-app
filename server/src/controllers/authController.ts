@@ -53,7 +53,7 @@ export const registerUser = async (
       sameSite: "none",
     });
 
-    res.status(200).json({
+    res.status(201).json({
       status: "success",
       userId: inserted.insertedId,
     });
@@ -131,7 +131,7 @@ type LoginCredentials = {
   password: string;
 };
 
-interface RequestWithUserId extends Request {
+export interface RequestWithUserId extends Request {
   userId?: string;
 }
 

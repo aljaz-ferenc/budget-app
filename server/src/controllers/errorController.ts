@@ -1,6 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 
-class CustomError extends Error{
+export class CustomError extends Error{
     statusCode: number
     status: string
 
@@ -12,7 +12,7 @@ class CustomError extends Error{
     }
 }
 
-const GlobalErrorHandler = (err: CustomError,_req: Request,res: Response, _next: NextFunction) => {
+export const GlobalErrorHandler = (err: CustomError,_req: Request,res: Response, _next: NextFunction) => {
     err.statusCode = err.statusCode || 500
     err.status = err.status || 'error'
 
@@ -21,5 +21,3 @@ const GlobalErrorHandler = (err: CustomError,_req: Request,res: Response, _next:
         message: err.message
     })
 };
-
-module.exports = {CustomError, GlobalErrorHandler}
