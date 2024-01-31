@@ -6,11 +6,11 @@ const router = express.Router()
 
 router.route('/')
     .post(protectRoute, addTransaction)
+    .delete(protectRoute, deleteTransaction)
 
 router.route('/:transactionId')
     .get(protectRoute, getTransaction)
     .patch(protectRoute, updateTransaction)
-    .delete(protectRoute, deleteTransaction)
 
 router.route('/user/:userId')
     .get(protectRoute, getTransactionsByUser)
