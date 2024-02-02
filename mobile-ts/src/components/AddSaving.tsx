@@ -72,6 +72,7 @@ export default function AddSaving({
   }
 
   function handleDismiss() {
+    if(isDeleting || isFetching) return
     setModalIsVisible(false);
     setAmount("");
   }

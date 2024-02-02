@@ -13,6 +13,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useUserContext } from "context/UserContext";
 import LinearGradient from "../../components/LnearGradient";
 import { Text, TextInput, Button } from "react-native-paper";
+import { registerUser } from "../../../api";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -33,37 +34,30 @@ export default function RegisterScreen({ navigation }: Props) {
   const { updateLoggedInStatus, setUser } = useUserContext();
 
   async function handleRegister(userData: RegisterUserData) {
-    try {
-      setIsFetching(true);
-      const response = await fetch(
-        "http://192.168.1.16:3000/api/v1/auth/register",
-        {
-          method: "POST",
-          body: JSON.stringify(userData),
-          headers: {
-            "Content-Type": "application/json",
-          },
+    setIsFetching(true);
+    registerUser(userData)
+      .then((data) => {
+        if (data.status === "success") {
+          updateLoggedInStatus(true);
+          setUser(data.user);
+          navigation.replace("AppNavigator");
+        } else {
+          throw new Error(data.message);
         }
-      );
-      const data = await response.json();
-      if (data.status === "success") {
-        updateLoggedInStatus(true);
-        setUser(data.user);
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (err: any) {
-      console.log(err.message);
-    } finally {
-      setIsFetching(false);
-    }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
   }
 
   return (
     <>
-      <LinearGradient />
+      {/* <LinearGradient /> */}
       <View style={styles.container}>
-        <Text variant="displaySmall">Register!</Text>
+        <Text variant="displaySmall" style={{color: Theme.colors.text}}>Register!</Text>
         <View style={styles.inputContainer}>
           <TextInput
             autoCapitalize="none"
@@ -131,13 +125,12 @@ export default function RegisterScreen({ navigation }: Props) {
         {isFetching ? (
           <ActivityIndicator size={40} color={Theme.colors.blue} />
         ) : (
-          <Button
-          mode="contained"
-          onPress={() => handleRegister(userData)}
-          >Register</Button>
+          <Button mode="contained" buttonColor={Theme.colors.tertiary} onPress={() => handleRegister(userData)}>
+            Register
+          </Button>
         )}
         <View style={{ display: "flex", flexDirection: "row" }}>
-          <Text variant="labelLarge">Already have an account? </Text>
+          <Text variant="labelLarge" style={{color: Theme.colors.text}}>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text variant="labelLarge" style={styles.link}>
               Login
@@ -157,6 +150,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 20,
     padding: 10,
+    backgroundColor: Theme.colors.secondary
   },
   inputContainer: {
     width: "100%",
@@ -166,18 +160,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   input: {
+    justifyContent: 'center',
     width: "100%",
   },
   inputActive: {
     borderColor: Theme.colors.blue,
   },
-
   link: {
-    color: Theme.colors.blue,
+    color: Theme.colors.textLight,
+    textDecorationLine: 'underline'
   },
-  button: {
-    width: "100%",
-  },
+
 });
 
 type RegisterUserData = {

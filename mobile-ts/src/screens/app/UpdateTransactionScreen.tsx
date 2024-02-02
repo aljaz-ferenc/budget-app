@@ -8,19 +8,22 @@ import { useNavigation } from "@react-navigation/native";
 import { createTransaction, deleteTransactionApi, updateTransactionApi } from "../../../api";
 import { useUserContext } from "context/UserContext";
 import { FontAwesome5 } from '@expo/vector-icons';
+import { TransactionWithoutId } from "../../../types";
 
+interface Transaction extends TransactionWithoutId {
+  _id: string;
+}
 
 export default function UpdateTransactionScreen({ route }: any) {
   const { transaction } = route.params;
   const [date, setDate] = useState('');
-  const [amount, setAmount] = useState<string>();
-  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState<string>(transaction.amount);
+  const [description, setDescription] = useState(transaction.description);
   const navigation = useNavigation();
-  const { addTransaction } = useUserContext();
+  const { updateTransaction } = useUserContext();
   const [isFetching, setIsFetching] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false)
   const {deleteTransaction} = useUserContext()
-
 
   useEffect(() => {
     const dateString = formatCalendarDate(transaction.createdAt)
@@ -28,14 +31,33 @@ export default function UpdateTransactionScreen({ route }: any) {
   }, [])
 
 
-  // function submit() {
-  //   if (!amount || !description || !date) return;
-  //   const transaction: Transaction = {
-  //     createdAt: new Date(date),
-  //     amount: Number(amount),
-  //     description,
-  //     type: "expense",
-  //   };
+  function submit() {
+    if (!amount || !description || !date || !transaction) return;
+    setIsFetching(true)
+
+    const updatedTransaction: Transaction = {
+      ...transaction,
+      createdAt: new Date(date),
+      amount: Number(amount),
+      description
+    };
+
+    updateTransactionApi(updatedTransaction)
+      .then(data => {
+        if(data.status === 'success'){
+          updateTransaction(updatedTransaction)
+          navigation.goBack()
+        }else{
+          throw new Error(data.message)
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
+      .finally(() => {
+        setIsFetching(false)
+      })
+  }
 
   //   setIsFetching(true);
   //   updateTransactionApi(transaction)
@@ -93,7 +115,7 @@ export default function UpdateTransactionScreen({ route }: any) {
     <View style={styles.container}>
       <View style={styles.top}>
       <Text variant="headlineMedium" style={{ color: Theme.colors.text }}>
-        {transaction.description}
+        Update Transaction
       </Text>
       {isDeleting ? <ActivityIndicator color={Theme.colors.danger} size={24}/> : <TouchableOpacity onPress={handleDeleteTransaction}>
       <FontAwesome5 name="trash" size={20} color={Theme.colors.danger} />
@@ -113,7 +135,7 @@ export default function UpdateTransactionScreen({ route }: any) {
                 setAmount(text);
               }
             }}
-            value={transaction.amount.toString()}
+            value={amount.toString()}
           />
         </View>
         <View>
@@ -125,7 +147,7 @@ export default function UpdateTransactionScreen({ route }: any) {
             label="Description"
             mode="outlined"
             onChangeText={(text) => setDescription(text)}
-            value={transaction.description}
+            value={description}
           />
         </View>
       </View>
@@ -156,9 +178,9 @@ export default function UpdateTransactionScreen({ route }: any) {
             textColor={Theme.colors.text}
             buttonColor={Theme.colors.tertiary}
             mode="contained"
-            // onPress={submit}
+            onPress={submit}
           >
-            Add Transaction
+            Update
           </Button>
         </View>
       )}

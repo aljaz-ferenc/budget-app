@@ -40,7 +40,7 @@ export default function HomeScreen({ navigation }: any) {
   const totalIncome = useMemo(() => getTotalIncome(user), [user.incomes]) || 0;
   const totalSavings = useMemo(() => getTotalSaved(user), [user.savings]) || 0;
   const totalBudget = useMemo(() => getTotalBudget(user), [user.budgets]) || 0;
-  const totalBalance = totalIncome - totalExpenses
+  const totalBalance = totalIncome - totalExpenses - totalSavings
 
   return (
     <PaperProvider>

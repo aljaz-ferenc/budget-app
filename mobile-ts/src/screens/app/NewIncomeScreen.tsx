@@ -7,6 +7,7 @@ import Theme from "theme/colors";
 import { useNavigation } from "@react-navigation/native";
 import { createTransaction } from "../../../api";
 import { useUserContext } from "context/UserContext";
+import { TransactionWithoutId } from "../../../types";
 
 const today = new Date();
 const todayString = `${today.getFullYear()}-${(today.getMonth() + 1)
@@ -33,8 +34,9 @@ export default function NewIncomeScreen({ route }: any) {
     : {};
 
   function submit() {
+    console.log(amount, description, date)
     if (!amount || !description || !date) return;
-    const transaction: Transaction = {
+    const transaction: TransactionWithoutId = {
       createdAt: date === todayString ? new Date() : new Date(date),
       amount: Number(amount),
       description,

@@ -35,6 +35,7 @@ export const registerUser = async (
         username,
         email,
         password: hash,
+        currency: "EUR"
       });
       inserted = result;
     } catch (err: any) {
@@ -60,6 +61,7 @@ export const registerUser = async (
     res.status(201).json({
       status: "success",
       user: user,
+      token
     });
   } catch (err: any) {
     res.status(500).json({
@@ -82,7 +84,7 @@ export const loginUser = async (
     const usersCollection: Collection = await getCollection(Collections.USERS);
     const user = await usersCollection.aggregate([
       {
-        $match: {email}
+        $match: { email }
       },
       {
         $lookup: {
@@ -92,18 +94,9 @@ export const loginUser = async (
           as: 'incomes'
         }
       },
-      // {
-      //   $lookup:{
-      //     from :'transactions',
-      //     foreignField: '_id',
-      //     localField:'savings',
-      //     as: 'savings'
-      //   }
-      // },
       {
         $unwind: { path: "$budgets", preserveNullAndEmptyArrays: true }
       },
-
       {
         $lookup: {
           from: 'transactions',
@@ -117,15 +110,23 @@ export const loginUser = async (
           _id: '$_id',
           username: { $first: '$username' },
           email: { $first: '$email' },
-          password: {$first: '$password'},
+          password: { $first: '$password' },
           currency: { $first: '$currency' },
           incomes: { $first: '$incomes' },
           savings: { $first: '$savings' },
-          budgets: { $push: '$budgets' },
+          budgets: {
+            $push: {
+              $cond: {
+                if: { $eq: ['$budgets', null] },
+                then: null,  // If budgets is null, push null
+                else: '$budgets'
+              }
+            }
+          }
         }
       }
-
-    ]).toArray()
+    ]).toArray();
+    
     console.log(user)
 
     if (!user)

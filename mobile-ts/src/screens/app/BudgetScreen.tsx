@@ -26,6 +26,7 @@ export default function BudgetScreen() {
     else return Math.round(result);
   }, [user.budgets]);
 
+
   return (
     <Provider>
       <View style={styles.budgets}>
@@ -71,7 +72,7 @@ export default function BudgetScreen() {
             </View>
           </View>
         </View>
-       {user.budgets && user.budgets.length > 0 ? <View style={styles.budgetsList}>
+       {user.budgets.length > 0 ? <View style={styles.budgetsList}>
           {user?.budgets.length > 0 && (
             <FlatList
               keyExtractor={(item) => item.id}

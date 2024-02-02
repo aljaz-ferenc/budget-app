@@ -51,7 +51,10 @@ export default function NewSaving({
           borderRadius: 10,
         }}
         visible={modalIsVisible}
-        onDismiss={() => setModalIsVisible(false)}
+        onDismiss={() => {
+          if(isSubmitting) return 
+          setModalIsVisible(false)
+        }}
         style={styles.modalContainer}
       >
         <View style={styles.newBudgetContainer}>

@@ -5,7 +5,13 @@ import {
   useContext,
   Dispatch,
 } from "react";
-import { Transaction, Budget, Saving, TransactionType } from "../../types";
+import { Budget, Saving, TransactionType, TransactionWithoutId } from "../../types";
+// import { Transaction } from 'screens/app/NewTransactionScreen';
+
+interface Transaction extends TransactionWithoutId {
+  _id: string;
+}
+
 
 type User = {
   username: string;
@@ -47,6 +53,7 @@ type UserContextType = {
   deleteSaving: (savingId: string) => void;
   deleteTransaction: (transactionId: string, type: TransactionType) => void;
   deleteBudget: (budgetId: string) => void
+  updateTransaction: (transaction: Transaction) => void
 };
 
 type Props = {
@@ -67,7 +74,8 @@ enum ActionType {
   UPDATESAVING = "UPDATESAVING",
   DELETESAVING = "DELETESAVING",
   DELETETRANSACTION = "DELETETRANSACTION",
-  DELETEBUDGET = "DELETEBUDGET"
+  DELETEBUDGET = "DELETEBUDGET",
+  UPDATETRANSACTION = "UPDATETRANSACTION"
 }
 
 function userReducer(state: User, action: ReducerAction) {
@@ -77,7 +85,14 @@ function userReducer(state: User, action: ReducerAction) {
     }
 
     case ActionType.SETUSER: {
-      return { ...state, ...action.payload };
+      const user: User = action.payload
+      if(!user.budgets) return {...state, ...user}
+      if(user.budgets[0].id === undefined){
+        user.budgets = user.budgets.filter(budget => {
+          budget.id !== undefined
+        })
+      }
+      return { ...state, ...user };
     }
 
     case ActionType.ADDBUDGET: {
@@ -173,6 +188,45 @@ function userReducer(state: User, action: ReducerAction) {
       return {...state, budgets: updatedBudgets}
     }
 
+    case ActionType.UPDATETRANSACTION:{
+      const transaction: Transaction = action.payload
+      console.log("NEW TRANSACTION: ", transaction)
+
+      if(transaction.type === 'income'){
+        const updatedIncomes = state.incomes.map(income => {
+          if(income._id === transaction._id){
+            return transaction
+          }else{
+            return income
+          }
+        })
+
+        return {...state, incomes: updatedIncomes}
+      }
+
+      if(transaction.type === 'expense'){
+        const budget = state.budgets.find(budget => {
+          return budget.transactions.some(t => t._id === transaction._id)
+        })
+        
+        if(budget){
+          const filteredTransactions = [...budget.transactions].filter(t => {
+            t._id !== transaction._id
+          })
+          
+          const updatedTransactions = [...filteredTransactions, transaction]
+          budget.transactions = updatedTransactions
+
+        const filteredBudgets = [...state.budgets].filter(b => b.id !== budget.id)
+        const updatedBudgets = [...filteredBudgets, budget]
+
+        return {...state, budgets: updatedBudgets}
+        }else{
+          return state
+        }
+      }
+    }
+
     default:
       return state;
   }
@@ -200,6 +254,10 @@ export default function UserContextProvider({ children }: Props) {
 
   function deleteTransaction(transactionId: string, type: TransactionType) {
     dispatch({ type: ActionType.DELETETRANSACTION, payload: {transactionId, type} });
+  }
+
+  function updateTransaction(transaction: Transaction){
+    dispatch({type: ActionType.UPDATETRANSACTION, payload: transaction})
   }
 
   function addSaving(saving: Saving) {
@@ -301,7 +359,8 @@ export default function UserContextProvider({ children }: Props) {
         getTotalSaved,
         deleteSaving,
         deleteTransaction,
-        deleteBudget
+        deleteBudget,
+        updateTransaction
       }}
     >
       {children}

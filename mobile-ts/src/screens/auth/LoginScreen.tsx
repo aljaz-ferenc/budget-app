@@ -50,9 +50,9 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <>
-      <LinearGradient />
+      {/* <LinearGradient /> */}
       <View style={styles.container}>
-        <Text variant="displaySmall">
+        <Text variant="displaySmall" style={{color: Theme.colors.text}}>
           Welcome Back!
         </Text>
         {error && <Text>{error}</Text>}
@@ -95,12 +95,12 @@ export default function LoginScreen({ navigation }: Props) {
 
           <Button 
           onPress={() => handleLogin(userData)} 
-          mode="contained">
+          mode="contained" buttonColor={Theme.colors.tertiary}>
             Login
           </Button>
         )}
         <View style={{ display: "flex", flexDirection: "row" }}>
-          <Text variant="labelLarge">Don't have an account? </Text>
+          <Text variant="labelLarge" style={{color:Theme.colors.text}}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate("Register")}>
             <Text variant="labelLarge" style={styles.link}>
               Register
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 20,
     padding: 10,
+    backgroundColor: Theme.colors.secondary
   },
   inputContainer: {
     width: "100%",
@@ -132,7 +133,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   link: {
-    color: Theme.colors.blue,
+    color: Theme.colors.textLight,
+    textDecorationLine: 'underline'
   },
   button: {
     width: "100%",
@@ -152,3 +154,10 @@ export type LoginUserData = {
   email: string;
   password: string;
 };
+
+export type RegisterUserData = {
+  username: string,
+  email: string,
+  password: string,
+  passwordConfirm: string
+}

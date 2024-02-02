@@ -23,15 +23,19 @@ export type TransactionStackParamList={
   NewIncome: undefined
 }
 
-export type Transaction = {
-  _id: string;
+export type TransactionWithoutId = {
+  // _id: string;
   amount: number;
-  item: string;
-  createdAt: string;
+  createdAt: Date;
   budgetId?: string;
   description: string;
   type: TransactionType
 };
+
+interface Transaction extends TransactionWithoutId {
+    _id: string;
+}
+
 
 export type Budget  ={
   name: string,

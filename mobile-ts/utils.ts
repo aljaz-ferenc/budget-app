@@ -1,4 +1,4 @@
-export function formatCurrency(number: number, currency: string) {
+export function formatCurrency(number: number, currency: string ) {
   let locale: string;
 
   switch (currency.toLocaleLowerCase()) {

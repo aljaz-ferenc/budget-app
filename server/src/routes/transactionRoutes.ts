@@ -10,7 +10,7 @@ router.route('/')
 
 router.route('/:transactionId')
     .get(protectRoute, getTransaction)
-    .patch(protectRoute, updateTransaction)
+    .put(protectRoute, updateTransaction)
 
 router.route('/user/:userId')
     .get(protectRoute, getTransactionsByUser)

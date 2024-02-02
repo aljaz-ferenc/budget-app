@@ -27,7 +27,6 @@ export default function WelcomeScreen({ navigation }: Props) {
     setIsFetching(true);
     autoLogin()
       .then((data) => {
-        console.log('WELCOME SCREEN ',data.user)
         updateLoggedInStatus(true);
         setUser(data.user);
         navigation.replace("AppNavigator");
@@ -46,10 +45,12 @@ export default function WelcomeScreen({ navigation }: Props) {
         </View>
       ) : (
         <View style={styles.container}>
-          <LinearGradient />
+          {/* <LinearGradient /> */}
           <Button
             mode="contained"
             style={{ width: "50%" }}
+            buttonColor={Theme.colors.tertiary}
+
             onPress={() => navigation.replace("Login")}
           >
             Login
@@ -57,6 +58,7 @@ export default function WelcomeScreen({ navigation }: Props) {
           <Button
             mode="contained"
             style={{ width: "50%" }}
+            buttonColor={Theme.colors.tertiary}
             onPress={() => navigation.replace("Register")}
           >
             Register
@@ -74,6 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 20,
+    backgroundColor: Theme.colors.secondary
   },
   image: {
     flex: 1,

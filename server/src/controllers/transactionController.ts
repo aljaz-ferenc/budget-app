@@ -174,27 +174,24 @@ export const updateTransaction = async (
   res: Response,
   _next: NextFunction
 ) => {
-  const { transactionId } = req.params;
   const transactionsCollection: Collection<Document> = await getCollection(
     Collections.TRANSACTIONS
   );
-  const updates = req.body;
-
-  if (Object.keys(updates).length === 0) res.end();
+  const {transaction} = req.body;
+  const transactionId = new ObjectId(transaction._id)
+  transaction._id = transactionId
 
   try {
-    await transactionsCollection.updateOne(
-      { _id: new ObjectId(transactionId) },
-      { $set: { ...updates } }
-    );
+    await transactionsCollection.replaceOne(
+      { _id: transactionId },transaction );
 
-    const transaction: Document | null = await transactionsCollection.findOne({
-      _id: new ObjectId(transactionId),
+    const updatedTransaction: Document | null = await transactionsCollection.findOne({
+      _id: transactionId,
     });
 
     res.status(200).json({
       status: "success",
-      transaction,
+      updatedTransaction,
     });
   } catch (err: any) {
     res.status(500).json({

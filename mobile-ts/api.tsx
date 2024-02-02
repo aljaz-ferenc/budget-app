@@ -1,8 +1,8 @@
 import { BudgetAsProp } from "components/NewBudget";
 import * as SecureStore from "expo-secure-store";
-import { Transaction } from "screens/app/NewTransactionScreen";
-import { LoginUserData } from "screens/auth/LoginScreen";
-import { Saving } from "./types";
+// import { Transaction } from "screens/app/NewTransactionScreen";
+import { LoginUserData, RegisterUserData } from "screens/auth/LoginScreen";
+import { Saving, TransactionWithoutId } from "./types";
 import { SavingAsProp } from "components/NewSaving";
 
 const BASE_URL = "http://192.168.1.16:3000/api/v1";
@@ -44,6 +44,28 @@ export async function loginUser(userData: LoginUserData) {
     if (data.status === "success") {
       SecureStore.setItem("budget-app", data.token);
 
+      return data;
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (err: any) {
+    throw err;
+  }
+}
+
+export async function registerUser(userData: RegisterUserData) {
+  try {
+    const response = await fetch(`${BASE_URL}/auth/register`, {
+      method: "POST",
+      body: JSON.stringify(userData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    if (data.status === "success") {
+      SecureStore.setItem("budget-app", data.token);
       return data;
     } else {
       throw new Error(data.message);
@@ -125,7 +147,7 @@ export async function deleteBudgetApi(budgetId: string) {
   try {
     const response = await fetch(`${BASE_URL}/users/budgets`, {
       method: "DELETE",
-      body: JSON.stringify({budgetId}),
+      body: JSON.stringify({ budgetId }),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${SecureStore.getItem("budget-app")}`,
@@ -143,8 +165,12 @@ export async function deleteBudgetApi(budgetId: string) {
   }
 }
 
+interface Transaction extends TransactionWithoutId {
+  _id: string;
+}
+
 export async function createTransaction(
-  transaction: Transaction,
+  transaction: TransactionWithoutId,
   budgetId?: string
 ) {
   const body = {
@@ -172,15 +198,39 @@ export async function createTransaction(
   }
 }
 
-export async function updateTransactionApi() {}
+export async function updateTransactionApi(transaction: Transaction) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/transactions/${transaction._id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ transaction }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${SecureStore.getItem("budget-app")}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      return data;
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (err: any) {
+    throw err;
+  }
+}
 
 export async function deleteTransactionApi(
   transactionId: string,
   transactionType: string,
-  budgetId?: string,
+  budgetId?: string
 ) {
   const body = { transactionId, transactionType, budgetId };
-  console.log('BODY ', body)
+  console.log("BODY ", body);
   try {
     const response = await fetch(`${BASE_URL}/transactions`, {
       method: "DELETE",
