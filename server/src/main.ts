@@ -22,9 +22,9 @@ app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/transactions', transactionRoutes)
 app.use('/api/v1/users', userRoutes)
 
-const PORT = process.env.PORT || '3000'
+const PORT = process.env.PORT || 3000
 
-app.listen(3000, () =>
+app.listen(PORT, () =>
   console.log(`Listening on port ${PORT}...`),
 );
 

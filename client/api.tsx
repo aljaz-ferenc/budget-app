@@ -5,7 +5,7 @@ import { LoginUserData, RegisterUserData } from "screens/auth/LoginScreen";
 import { Saving, TransactionWithoutId } from "./types";
 import { SavingAsProp } from "components/NewSaving";
 
-const BASE_URL = "http://192.168.1.16:3000/api/v1";
+const BASE_URL = process.env.BASE_URL || "http://192.168.1.16:3000/api/v1";
 
 export async function getTransactions(userId: string) {
   try {
